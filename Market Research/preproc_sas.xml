@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?><_ROOT_ EMVERSION="15.2" ORIENTATION="HORIZONTAL">
+<Workspace>
+<NODES>
+<NODE CLASS="SASHELP.EMUTIL.CONTROLPOINT.CLASS" COMPONENT="ControlPoint" ID="CNTRL" X="617" Y="266" DESCRIPTION="Control Point" DIAGRAMID="_ROOT_" PARENTID="">
+<PROPERTIES/>
+</NODE>
+<NODE CLASS="SASHELP.EMCORE.EXTENSION.CLASS" COMPONENT="EMSave" ID="EMSave" X="864" Y="374" DESCRIPTION="Save Data" DIAGRAMID="_ROOT_" PARENTID="" TOOLTYPE="UTILITY" TOOLPREFIX="EMSave">
+<PROPERTIES Location="CATALOG" Catalog="Sashelp.Emutil.Savext.Source" Type="XLSX" Replace="Y" AllObs="Y" OutObs="1000" AllRoles="Y" Train="Y" Validate="Y" Test="Y" Score="Y" Transaction="Y" ForceRun="N" RunAction="Train" Component="EMSave" Lib="" DirectorySelector="" Name="">
+<VariableProperties/>
+<EmVariableAttributes/>
+<EmTargetAttributes/>
+<EmFileProperties>
+<USERTRAINCODE Type="EXTERNAL" Extension="sas">
+<Data/>
+</USERTRAINCODE>
+<EMNOTES Type="EXTERNAL" Extension="txt">
+<Data/>
+</EMNOTES>
+</EmFileProperties>
+</PROPERTIES>
+</NODE>
+<NODE CLASS="SASHELP.EMCORE.EXTENSION.CLASS" COMPONENT="FileImport" ID="FIMPORT" X="134" Y="440" DESCRIPTION="File Import" DIAGRAMID="_ROOT_" PARENTID="" TOOLTYPE="SAMPLE" TOOLPREFIX="FIMPORT">
+<PROPERTIES Location="CATALOG" Catalog="SASHELP.EMSAMP.Fimport.SOURCE" ImportType="Local" GuessRows="500" Delimiter="," NameRow="Y" SkipRows="0" MaxRows="1000000" MaxCols="10000" FileType="xlsx" Role="TRAIN" ForceRun="N" Summarize="N" AdvancedAdvisor="N" RunAction="Train" Component="FileImport" IFileName="C:\Users\matil\OneDrive\Documentos\UNI\Data Preprocessing and Visualization\Project data.xlsx" AccessTable="NoTableName" UserID="NoUserID" Password="NoPassword">
+<VariableProperties/>
+<EmVariableAttributes>
+<DELTA Variable="CustomerNo" AttributeName="ROLE" AttributeValue="ID"/>
+<DELTA Variable="Date" AttributeName="ROLE" AttributeValue="INPUT"/>
+<DELTA Variable="Kids" AttributeName="LEVEL" AttributeValue="NOMINAL"/>
+<DELTA Variable="ProductID" AttributeName="ROLE" AttributeValue="ID"/>
+<DELTA Variable="ProductID" AttributeName="DROP" AttributeValue="Y"/>
+<DELTA Variable="Product_Category_ID" AttributeName="ROLE" AttributeValue="ID"/>
+<DELTA Variable="Product_Category_ID" AttributeName="DROP" AttributeValue="Y"/>
+<DELTA Variable="Reviews" AttributeName="LEVEL" AttributeValue="NOMINAL"/>
+<DELTA Variable="TransactionNo" AttributeName="ROLE" AttributeValue="ID"/>
+</EmVariableAttributes>
+<EmTargetAttributes/>
+<EmFileProperties>
+<USERTRAINCODE Type="EXTERNAL" Extension="sas">
+<Data/>
+</USERTRAINCODE>
+<VARIABLESETDELTA Type="EXTERNAL" Extension="txt">
+<Data><![CDATA[
+if NAME=&quot;CustomerNo&quot; then do;
+ROLE=&quot;ID&quot;;
+LEVEL=&quot;INTERVAL&quot;;
+ORDER=&quot;&quot;;
+DROP=&quot;N&quot;;
+end;
+if NAME=&quot;Date&quot; then do;
+ROLE=&quot;INPUT&quot;;
+LEVEL=&quot;INTERVAL&quot;;
+ORDER=&quot;&quot;;
+DROP=&quot;N&quot;;
+end;
+if NAME=&quot;Kids&quot; then do;
+ROLE=&quot;INPUT&quot;;
+LEVEL=&quot;NOMINAL&quot;;
+ORDER=&quot;&quot;;
+DROP=&quot;N&quot;;
+end;
+if NAME=&quot;Product_Category_ID&quot; then do;
+ROLE=&quot;ID&quot;;
+LEVEL=&quot;INTERVAL&quot;;
+ORDER=&quot;&quot;;
+DROP=&quot;Y&quot;;
+end;
+if NAME=&quot;ProductID&quot; then do;
+ROLE=&quot;ID&quot;;
+LEVEL=&quot;INTERVAL&quot;;
+ORDER=&quot;&quot;;
+DROP=&quot;Y&quot;;
+end;
+if NAME=&quot;Reviews&quot; then do;
+ROLE=&quot;INPUT&quot;;
+LEVEL=&quot;NOMINAL&quot;;
+ORDER=&quot;&quot;;
+DROP=&quot;N&quot;;
+end;
+if NAME=&quot;TransactionNo&quot; then do;
+ROLE=&quot;ID&quot;;
+LEVEL=&quot;INTERVAL&quot;;
+ORDER=&quot;&quot;;
+DROP=&quot;N&quot;;
+end;
+]]>
+</Data>
+</VARIABLESETDELTA>
+<DELTACODE Type="EXTERNAL" Extension="txt">
+<Data><![CDATA[
+if NAME=&quot;CustomerNo&quot; then do;
+ROLE=&quot;ID&quot;;
+LEVEL=&quot;INTERVAL&quot;;
+ORDER=&quot;&quot;;
+end;
+if NAME=&quot;Date&quot; then do;
+ROLE=&quot;INPUT&quot;;
+LEVEL=&quot;INTERVAL&quot;;
+ORDER=&quot;&quot;;
+end;
+if NAME=&quot;Kids&quot; then do;
+ROLE=&quot;INPUT&quot;;
+LEVEL=&quot;NOMINAL&quot;;
+ORDER=&quot;&quot;;
+end;
+if NAME=&quot;Product_Category_ID&quot; then do;
+ROLE=&quot;ID&quot;;
+LEVEL=&quot;INTERVAL&quot;;
+ORDER=&quot;&quot;;
+end;
+if NAME=&quot;Product_Category_ID&quot; then delete;
+if NAME=&quot;ProductID&quot; then do;
+ROLE=&quot;ID&quot;;
+LEVEL=&quot;INTERVAL&quot;;
+ORDER=&quot;&quot;;
+end;
+if NAME=&quot;ProductID&quot; then delete;
+if NAME=&quot;Reviews&quot; then do;
+ROLE=&quot;INPUT&quot;;
+LEVEL=&quot;NOMINAL&quot;;
+ORDER=&quot;&quot;;
+end;
+if NAME=&quot;TransactionNo&quot; then do;
+ROLE=&quot;ID&quot;;
+LEVEL=&quot;INTERVAL&quot;;
+ORDER=&quot;&quot;;
+end;
+drop DROP;
+]]>
+</Data>
+</DELTACODE>
+<EMNOTES Type="EXTERNAL" Extension="txt">
+<Data/>
+</EMNOTES>
+</EmFileProperties>
+</PROPERTIES>
+</NODE>
+<NODE CLASS="SASHELP.EMMDFY.FILTERTOOL.CLASS" COMPONENT="Filter" ID="Filter" X="373" Y="438" DESCRIPTION="Filter" DIAGRAMID="_ROOT_" PARENTID="" TOOLTYPE="MODIFY" TOOLPREFIX="Filter">
+<PROPERTIES KeepMissingClass="Y" KeepMissingInterval="Y" NormalizeClassValue="Y" ExportTable="FILTERED" TabletoFilter="TRAIN" IntervalFilterMethod="MANUAL" ClassFilterMethod="NONE" MinFreq="1" MinPercent="0.01" MaxValues="25" MADSCutoff="9" SpacingsCutoff="9" StddevCutoff="3" PercentsCutoff="0.5" PublishScoreCode="Y" CreateDistributionData="Y" UpdateClassLevel="N" ForceRun="N" RunAction="Train" Component="Filter">
+<VariableProperties/>
+<EmVariableAttributes>
+<DELTA Variable="Age" AttributeName="CALCMETHOD" AttributeValue="MANUAL"/>
+<DELTA Variable="Age" AttributeName="INTERVALMIN" AttributeValue="0"/>
+<DELTA Variable="Age" AttributeName="INTERVALMAX" AttributeValue="88.93473"/>
+<DELTA Variable="Monthly_Income" AttributeName="CALCMETHOD" AttributeValue="MANUAL"/>
+<DELTA Variable="Monthly_Income" AttributeName="INTERVALMIN" AttributeValue="0"/>
+<DELTA Variable="Monthly_Income" AttributeName="INTERVALMAX" AttributeValue="7189.64"/>
+<DELTA Variable="Quantity" AttributeName="CALCMETHOD" AttributeValue="MANUAL"/>
+<DELTA Variable="Quantity" AttributeName="INTERVALMIN" AttributeValue="0"/>
+<DELTA Variable="Quantity" AttributeName="INTERVALMAX" AttributeValue="9.243"/>
+</EmVariableAttributes>
+<EmTargetAttributes/>
+<EmFileProperties>
+<CLASSFILTER Type="DATA">
+<Data/>
+<Metadata>
+<Variable NAME="VARIABLE" LABEL="Variable" LENGTH="32" FORMAT="" TYPE="C"/>
+<Variable NAME="VALUE" LABEL="Value" LENGTH="35" FORMAT="" TYPE="C"/>
+<Variable NAME="COUNT" LABEL="Frequency Count" LENGTH="8" FORMAT="" TYPE="N"/>
+<Variable NAME="PERCENT" LABEL="Percent" LENGTH="8" FORMAT="" TYPE="N"/>
+<Variable NAME="Filter" LABEL="" LENGTH="1" FORMAT="" TYPE="C"/>
+</Metadata>
+</CLASSFILTER>
+<EMNOTES Type="EXTERNAL" Extension="txt">
+<Data/>
+</EMNOTES>
+</EmFileProperties>
+</PROPERTIES>
+</NODE>
+<NODE CLASS="SASHELP.EMMDFY.FILTERTOOL.CLASS" COMPONENT="Filter" ID="Filter2" X="373" Y="513" DESCRIPTION="Filter (Excluded)" DIAGRAMID="_ROOT_" PARENTID="" TOOLTYPE="MODIFY" TOOLPREFIX="Filter">
+<PROPERTIES KeepMissingClass="Y" KeepMissingInterval="Y" NormalizeClassValue="Y" ExportTable="EXCLUDED" TabletoFilter="TRAIN" IntervalFilterMethod="MANUAL" ClassFilterMethod="NONE" MinFreq="1" MinPercent="0.01" MaxValues="25" MADSCutoff="9" SpacingsCutoff="9" StddevCutoff="3" PercentsCutoff="0.5" PublishScoreCode="Y" CreateDistributionData="Y" UpdateClassLevel="N" ForceRun="N" RunAction="Train" Component="Filter">
+<VariableProperties/>
+<EmTargetAttributes/>
+<EmVariableAttributes>
+<DELTA Variable="Age" AttributeName="CALCMETHOD" AttributeValue="MANUAL"/>
+<DELTA Variable="Age" AttributeName="INTERVALMIN" AttributeValue="0"/>
+<DELTA Variable="Age" AttributeName="INTERVALMAX" AttributeValue="88.93473"/>
+<DELTA Variable="Monthly_Income" AttributeName="CALCMETHOD" AttributeValue="MANUAL"/>
+<DELTA Variable="Monthly_Income" AttributeName="INTERVALMIN" AttributeValue="0"/>
+<DELTA Variable="Monthly_Income" AttributeName="INTERVALMAX" AttributeValue="7189.64"/>
+<DELTA Variable="Quantity" AttributeName="CALCMETHOD" AttributeValue="MANUAL"/>
+<DELTA Variable="Quantity" AttributeName="INTERVALMIN" AttributeValue="0"/>
+<DELTA Variable="Quantity" AttributeName="INTERVALMAX" AttributeValue="9.243"/>
+</EmVariableAttributes>
+<EmFileProperties>
+<CLASSFILTER Type="DATA">
+<Data/>
+<Metadata>
+<Variable NAME="VARIABLE" LABEL="Variable" LENGTH="32" FORMAT="" TYPE="C"/>
+<Variable NAME="VALUE" LABEL="Value" LENGTH="35" FORMAT="" TYPE="C"/>
+<Variable NAME="COUNT" LABEL="Frequency Count" LENGTH="8" FORMAT="" TYPE="N"/>
+<Variable NAME="PERCENT" LABEL="Percent" LENGTH="8" FORMAT="" TYPE="N"/>
+<Variable NAME="Filter" LABEL="" LENGTH="1" FORMAT="" TYPE="C"/>
+</Metadata>
+</CLASSFILTER>
+<EMNOTES Type="EXTERNAL" Extension="txt">
+<Data/>
+</EMNOTES>
+</EmFileProperties>
+</PROPERTIES>
+</NODE>
+<NODE CLASS="SASHELP.EMCORE.EXTENSION.CLASS" COMPONENT="GraphExplore" ID="GrfExpl" X="378" Y="181" DESCRIPTION="Graph Explore" DIAGRAMID="_ROOT_" PARENTID="" TOOLTYPE="EXPLORE" TOOLPREFIX="GrfExpl">
+<PROPERTIES Location="CATALOG" Catalog="SASHELP.EMEXPL.GRAPHEXPLORE.SOURCE" EmSampleMethod="FIRSTN" EmSampleSize="DEFAULT" EmRandomSeed="12345" Target="Y" GroupByTarget="Y" ForceRun="N" RunAction="Train" Component="GraphExplore" DataSource="SAMPLE" DataNeeded="Y">
+<VariableProperties/>
+<EmVariableAttributes/>
+<EmTargetAttributes/>
+<EmFileProperties>
+<USERTRAINCODE Type="EXTERNAL" Extension="sas">
+<Data/>
+</USERTRAINCODE>
+<EMNOTES Type="EXTERNAL" Extension="txt">
+<Data/>
+</EMNOTES>
+</EmFileProperties>
+</PROPERTIES>
+</NODE>
+<NODE CLASS="SASHELP.EMCORE.EXTENSION.CLASS" COMPONENT="GraphExplore" ID="GrfExpl2" X="536" Y="388" DESCRIPTION="Graph Explore (No Outliers)" DIAGRAMID="_ROOT_" PARENTID="" TOOLTYPE="EXPLORE" TOOLPREFIX="GrfExpl">
+<PROPERTIES Location="CATALOG" Catalog="SASHELP.EMEXPL.GRAPHEXPLORE.SOURCE" EmSampleMethod="FIRSTN" EmSampleSize="DEFAULT" EmRandomSeed="12345" Target="Y" GroupByTarget="Y" ForceRun="N" RunAction="Train" Component="GraphExplore" DataSource="SAMPLE" DataNeeded="Y">
+<VariableProperties/>
+<EmTargetAttributes/>
+<EmVariableAttributes/>
+<EmFileProperties>
+<USERTRAINCODE Type="EXTERNAL" Extension="sas">
+<Data/>
+</USERTRAINCODE>
+<EMNOTES Type="EXTERNAL" Extension="txt">
+<Data/>
+</EMNOTES>
+</EmFileProperties>
+</PROPERTIES>
+</NODE>
+<NODE CLASS="SASHELP.EMCORE.EXTENSION.CLASS" COMPONENT="GraphExplore" ID="GrfExpl3" X="537" Y="513" DESCRIPTION="Graph Explore (Excluded Data)" DIAGRAMID="_ROOT_" PARENTID="" TOOLTYPE="EXPLORE" TOOLPREFIX="GrfExpl">
+<PROPERTIES Location="CATALOG" Catalog="SASHELP.EMEXPL.GRAPHEXPLORE.SOURCE" EmSampleMethod="FIRSTN" EmSampleSize="DEFAULT" EmRandomSeed="12345" Target="Y" GroupByTarget="Y" ForceRun="N" RunAction="Train" Component="GraphExplore" DataSource="SAMPLE" DataNeeded="Y">
+<VariableProperties/>
+<EmTargetAttributes/>
+<EmVariableAttributes/>
+<EmFileProperties>
+<USERTRAINCODE Type="EXTERNAL" Extension="sas">
+<Data/>
+</USERTRAINCODE>
+<EMNOTES Type="EXTERNAL" Extension="txt">
+<Data/>
+</EMNOTES>
+</EmFileProperties>
+</PROPERTIES>
+</NODE>
+<NODE CLASS="SASHELP.EMMDFY.EMIMPUTE.CLASS" COMPONENT="Impute" ID="Impt" X="686" Y="438" DESCRIPTION="Impute" DIAGRAMID="_ROOT_" PARENTID="" TOOLTYPE="MODIFY" TOOLPREFIX="Impt">
+<PROPERTIES MethodInterval="TREE" MethodClass="CONSTANT" MethodTargetInterval="NONE" MethodTargetClass="NONE" ABWTuning="9" AHUBERTuning="1.5" AWAVETuning="6.2831853072" SpacingProportion="90" DefaultChar="" DefaultNum="." RandomSeed="12345" Normalize="Y" ImputeNoMissing="N" MaxPctMissing="80" ValidateTestMissing="N" DistributionMissing="N" LeafSize="5" Maxbranch="2" Maxdepth="6" MinCatSize="5" Nrules="5" Nsurrs="2" Splitsize="." Indicator="NONE" IndicatorRole="REJECTED" ReplaceVariable="N" HideVariable="Y" IndicatorSource="IMPUTED" ForceRun="N" RunAction="Train" Component="Impute">
+<VariableProperties/>
+<EmVariableAttributes>
+<DELTA Variable="Age" AttributeName="USE" AttributeValue="Y"/>
+<DELTA Variable="Channel" AttributeName="USE" AttributeValue="N"/>
+<DELTA Variable="Date" AttributeName="USE" AttributeValue="N"/>
+<DELTA Variable="Gender" AttributeName="USE" AttributeValue="N"/>
+<DELTA Variable="Kids" AttributeName="USE" AttributeValue="Y"/>
+<DELTA Variable="Kids" AttributeName="METHOD" AttributeValue="TREE"/>
+<DELTA Variable="Monthly_Income" AttributeName="USE" AttributeValue="Y"/>
+<DELTA Variable="Nationality" AttributeName="USE" AttributeValue="N"/>
+<DELTA Variable="Payment" AttributeName="USE" AttributeValue="N"/>
+<DELTA Variable="ProductName" AttributeName="USE" AttributeValue="N"/>
+<DELTA Variable="Product_Category_Name" AttributeName="USE" AttributeValue="N"/>
+<DELTA Variable="Quantity" AttributeName="USE" AttributeValue="N"/>
+<DELTA Variable="Reviews" AttributeName="USE" AttributeValue="Y"/>
+<DELTA Variable="Reviews" AttributeName="METHOD" AttributeValue="COUNT"/>
+<DELTA Variable="Reviews" AttributeName="USETREE" AttributeValue="N"/>
+<DELTA Variable="Total_payed" AttributeName="USE" AttributeValue="N"/>
+<DELTA Variable="Unit_Price" AttributeName="USE" AttributeValue="N"/>
+</EmVariableAttributes>
+<EmTargetAttributes/>
+<EmFileProperties>
+<EMNOTES Type="EXTERNAL" Extension="txt">
+<Data/>
+</EMNOTES>
+</EmFileProperties>
+</PROPERTIES>
+</NODE>
+<NODE CLASS="SASHELP.EMEXPL.MULTIPLOT.CLASS" COMPONENT="MultiPlot" ID="Plot" X="375" Y="237" DESCRIPTION="MultiPlot" DIAGRAMID="_ROOT_" PARENTID="" TOOLTYPE="EXPLORE" TOOLPREFIX="Plot">
+<PROPERTIES OutputCatalog="WORK.GOUT" TrainCode="" NumericThreshold="20" Orientation="VERTICAL" Statistic="FREQ" ShowValues="Y" IncludeMissing="Y" IntervalTargetChart="MEAN" ChartType="CHART" IntTargetRegression="LINEAR" DisplayRegEquation="N" ConfidenceInterval="Y" ImageFormat="GIF" ForceRun="N" RunAction="Train" Component="MultiPlot">
+<VariableProperties/>
+<EmVariableAttributes>
+<DELTA Variable="Date" AttributeName="USE" AttributeValue="N"/>
+<DELTA Variable="Nationality" AttributeName="USE" AttributeValue="N"/>
+<DELTA Variable="ProductName" AttributeName="USE" AttributeValue="N"/>
+</EmVariableAttributes>
+<EmTargetAttributes/>
+<EmFileProperties>
+<EMNOTES Type="EXTERNAL" Extension="txt">
+<Data/>
+</EMNOTES>
+</EmFileProperties>
+</PROPERTIES>
+</NODE>
+<NODE CLASS="SASHELP.EMEXPL.STATEXPLORE.CLASS" COMPONENT="StatExplore" ID="Stat" X="375" Y="294" DESCRIPTION="StatExplore" DIAGRAMID="_ROOT_" PARENTID="" TOOLTYPE="EXPLORE" TOOLPREFIX="Stat">
+<PROPERTIES BySegment="N" Correlation="Y" Spearman="N" Pearson="Y" ChiSquare="Y" ChiSquareInterval="N" ChiSquareIntervalNBins="5" MaximumVars="1000" HideVariable="Y" DropRejected="Y" UseValidate="N" UseTest="N" UseScore="N" NObs="100000" IntervalDistribution="Y" ClassDistribution="Y" LevelSummary="Y" ForceRun="N" RunAction="Train" Component="StatExplore">
+<VariableProperties/>
+<EmVariableAttributes/>
+<EmTargetAttributes/>
+<EmFileProperties>
+<CROSSTAB Type="DATA">
+<Data/>
+<Metadata/>
+</CROSSTAB>
+<EMNOTES Type="EXTERNAL" Extension="txt">
+<Data/>
+</EMNOTES>
+</EmFileProperties>
+</PROPERTIES>
+</NODE>
+<NODE CLASS="SASHELP.EMEXPL.STATEXPLORE.CLASS" COMPONENT="StatExplore" ID="Stat2" X="859" Y="438" DESCRIPTION="StatExplore (After Impute)" DIAGRAMID="_ROOT_" PARENTID="" TOOLTYPE="EXPLORE" TOOLPREFIX="Stat">
+<PROPERTIES BySegment="N" Correlation="Y" Spearman="N" Pearson="Y" ChiSquare="Y" ChiSquareInterval="N" ChiSquareIntervalNBins="5" MaximumVars="1000" HideVariable="Y" DropRejected="Y" UseValidate="N" UseTest="N" UseScore="N" NObs="100000" IntervalDistribution="Y" ClassDistribution="Y" LevelSummary="Y" ForceRun="N" RunAction="Train" Component="StatExplore">
+<VariableProperties/>
+<EmTargetAttributes/>
+<EmVariableAttributes/>
+<EmFileProperties>
+<CROSSTAB Type="DATA">
+<Data/>
+<Metadata/>
+</CROSSTAB>
+<EMNOTES Type="EXTERNAL" Extension="txt">
+<Data/>
+</EMNOTES>
+</EmFileProperties>
+</PROPERTIES>
+</NODE>
+<NODE CLASS="SASHELP.EMCORE.EXTENSION.CLASS" COMPONENT="VariableClustering" ID="VarClus" X="375" Y="354" DESCRIPTION="Variable Clustering" DIAGRAMID="_ROOT_" PARENTID="" TOOLTYPE="EXPLORE" TOOLPREFIX="VarClus">
+<PROPERTIES Location="CATALOG" Catalog="SASHELP.EMEXPL.VARIABLECLUSTERING.SOURCE" HideVariable="Y" MaxClus="." ClusSource="CORR" ClusHierachy="Y" IncludeClassVar="N" TwoStageClus="AUTO" SuppressSampWarn="N" ExportedComp="CLUSTERCOMP" MaxEigen="." Proportion="0" PrintOption="SHORT" ForceRun="N" RunAction="Train" Component="VariableClustering" DataNeeded="Y">
+<VariableProperties/>
+<EmVariableAttributes/>
+<EmTargetAttributes/>
+<EmFileProperties>
+<USERTRAINCODE Type="EXTERNAL" Extension="sas">
+<Data/>
+</USERTRAINCODE>
+<EMNOTES Type="EXTERNAL" Extension="txt">
+<Data/>
+</EMNOTES>
+</EmFileProperties>
+</PROPERTIES>
+</NODE>
+</NODES>
+<CONNECTIONS>
+<CONNECTION FROM="FIMPORT" TO="GrfExpl"/>
+<CONNECTION FROM="FIMPORT" TO="Plot"/>
+<CONNECTION FROM="FIMPORT" TO="Stat"/>
+<CONNECTION FROM="FIMPORT" TO="VarClus"/>
+<CONNECTION FROM="GrfExpl" TO="CNTRL"/>
+<CONNECTION FROM="Plot" TO="CNTRL"/>
+<CONNECTION FROM="Stat" TO="CNTRL"/>
+<CONNECTION FROM="VarClus" TO="CNTRL"/>
+<CONNECTION FROM="FIMPORT" TO="Filter"/>
+<CONNECTION FROM="FIMPORT" TO="Filter2"/>
+<CONNECTION FROM="Filter" TO="GrfExpl2"/>
+<CONNECTION FROM="Filter2" TO="GrfExpl3"/>
+<CONNECTION FROM="Filter" TO="Impt"/>
+<CONNECTION FROM="Impt" TO="Stat2"/>
+<CONNECTION FROM="Impt" TO="EMSave"/>
+</CONNECTIONS>
+<NOTES>
+<DATA><![CDATA[
+
+]]>
+</DATA>
+</NOTES>
+</Workspace>
+</_ROOT_>
