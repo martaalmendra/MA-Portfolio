@@ -1,0 +1,14 @@
+/* custom_colors.css */
+
+
+body {
+  color: #333; /* Dark text color */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #58B09C; /* Blue headings */
+}
+
+a {
+  color: #58B09C; /* Blue links */
+}

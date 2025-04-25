@@ -1,0 +1,387 @@
+---
+main_topsize: 0.1 
+main_bottomsize: 0.05
+main_findings:
+  - Forecasting Electric Production
+
+author:
+  - name: Francisco Gomes 20221810 |
+  - name: Maria Henriques 20221952 |
+  - name: Marta Almendra 20221878
+
+affiliation:
+    address: Bachelor in Data Science, Nova IMS
+
+output: 
+  posterdown::posterdown_betterport:
+    self_contained: false
+    pandoc_args: --mathjax
+    number_sections: false
+    css: custom_colors.css 
+bibliography: packages.bib
+link-citations: true
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      tidy = FALSE,
+                      message = FALSE,
+                      fig.align = 'center',
+                      out.width = "100%")
+options(knitr.table.format = "html") 
+```
+
+# Introduction
+
+Electric production is a critical factor in maintaining economic stability and supporting industrial activities. Accurate forecasting of electric production can help in planning and optimizing resources, thereby ensuring a reliable supply of electricity to meet demand. This project aims to develop a **time series model** to forecast electric production with the use of **Box-Jenkins Methodology**.
+
+The United States electric production industry is crucial to the stability and growth of the economy. It encompasses various sectors including power generation, distribution, and management. This industry is significantly impacted by seasonal variations, which reflect changes in energy consumption patterns due to weather conditions, economic activities, and other factors throughout the year. By analyzing these dynamics, stakeholders can gain valuable insights into energy demand, enabling them to plan and optimize resource management strategies effectively.
+
+```{r include = FALSE}
+##Libraries to use
+
+library(fpp3)
+library(lubridate)
+library(urca)
+
+## Setting a correct path
+
+setwd("C:/Users/Marta/Desktop/universidade/2nd year/Forecasting Methods/Forecast_Project")
+getwd()
+
+
+## Importing data
+
+eletric = read.csv('data_group_H.csv')
+```
+
+
+# Tentative Identification
+
+Monthly data on the average electric production was sourced from the Kaggle platform.
+The data was then turned into a tsibble object, and, to gain a better understanding of it, an initial graph was created to visualize patterns and trends that might be present. The data was clearly non-stationary, which was later addressed,it depicted a **rising trend** and showed **seasonality**, as seen in Figure 1.
+
+```{r include = FALSE}
+## Data Transformation
+
+#turning the dataset into a tsibble and initial adjustments
+eletric_tsibble = eletric %>%
+  mutate(Month = yearmonth(DATE)) %>%
+  select(Month, amount_electric = IPG2211A2N) %>%
+  as_tsibble(index = Month)
+
+
+## 1st Analysis - Plots 
+
+eletric_tsibble %>% gg_tsdisplay(amount_electric, plot_type = 'partial', lag_max = 36)
+
+eletric_tsibble %>% gg_season()
+#similar behaviors throughout the years, but with rising values
+   #high values in the beginning of the years
+   #drop in values from march to may
+   #with a following rising pattern in the summer
+
+eletric_tsibble %>% gg_subseries()
+```
+
+```{r eletric-plot, out.width='80%', fig.align='center', fig.cap = "Eletric prodution throughout the years", fig.height = 6 }
+eletric_tsibble %>% autoplot(amount_electric)
+#rising trend and seasonality present
+
+```
+
+Furthermore, the data was split into two sets to aid in the next phases: a training set that contained data from January 1985 to December 2015 for model estimation, and a test set with data from January 2016 to January 2018 for evaluating future projections.
+
+```{r include = FALSE}
+
+## Division of data into Train/Test sets
+
+# training set - jan 1985 to dec 2015
+eletric_training = eletric_tsibble %>%
+  filter(year(Month)<2016)
+
+# test set - jan 2016 - jan 2018 (duration of 2 years)
+eletric_test = eletric_tsibble %>%
+  filter(year(Month)>=2016)
+
+```
+
+By assessing the dataset's variance, we discovered that it was in fact not constant over time, hence a logarithmic adjustment was used to stabilize it. 
+
+```{r include = FALSE}
+## Variance analysis
+
+# Slight increase in variance over time 
+eletric_training %>% autoplot(amount_electric) 
+
+# use of a logarithm to stabilize it
+eletric_training %>% autoplot(log(amount_electric)) 
+```
+
+Moreover, to address non-stationarity, one **seasonal difference transformation** was applied. Since it became stationary after this step as confirmed through the
+**Augmented Dickey-Fuller** test, we proceeded to examine the Autocorrelation Function (ACF) and Partial Autocorrelation Function (PACF) plots to identify potential candidate models.
+
+```{r include = FALSE}
+## Dickey-Fuller Test & Differencing 
+
+# Dickey-Fuller test on the original stabilized data 
+
+summary(ur.df(na.omit(log(eletric_training$amount_electric)), type = c("trend"), lags = 12))  
+
+#test-statistic (-0.9588) > critical values at all significance levels
+   #null hypothesis of the presence of a unit root cannot be rejected
+        #time series still not stationary - so we will apply a seasonal difference
+
+
+### First Seasonal Difference ###
+
+eletric_training_diff <- eletric_training %>%
+  mutate(first_dif = difference(log(amount_electric), 12))
+
+
+# Dickey-Fuller test with first seasonal difference
+
+summary(ur.df(na.omit(eletric_training_diff$first_dif), type = c("trend"), lags = 12))
+# test-statistic (-6.433) < critical values at all significance levels 
+    #null hypothesis of the presence of a unit root is rejected
+         #so now we can carry on with the forecast
+
+
+# Visualize ACF and PACF
+eletric_training_diff %>% gg_tsdisplay(first_dif, plot_type = 'partial')
+ 
+```
+
+Strategies to choose the best model from among those tested passed through minimizing information criteria, such as Akaike information criterion (AIC) and  Bayesian information criterion (BIC), analyzing the residuals of the models, and conducting the Ljung-Box test to check for autocorrelation in the residuals. Finally, the accuracy of the more promising models was determined, and a final model was selected based on its accuracy and overall performance in forecasting the test set.
+
+
+# Results
+
+As previously mentioned, after achieving stationarity, the ACF and PACF were examined (Figure 2), and various ARIMA models were selected and analyzed.
+
+```{r include = FALSE}
+## Model identification: Fit various possible models 
+ 
+
+#ARIMA (p,d,q) (P,D,Q) - model combinations:
+
+# p usually 1 due to spike in pacf
+# d = 0 because we didn't do differencing
+# q usually 1 due to spike acf
+
+# P usually 1 due to spike at lag 12,24 in pacf
+# D = 1 since we made one seasonal difference 
+# Q usually 1 due to spike at lag 12 in acf
+
+
+fit <- eletric_training %>%
+  model(
+    sarima101111 = ARIMA(log(amount_electric) ~ 0 + pdq(1,0,1) + PDQ(1,1,1)),
+    
+    sarima101110 = ARIMA(log(amount_electric) ~ 0 + pdq(1,0,1) + PDQ(1,1,0)),
+    
+    sarima101010 = ARIMA(log(amount_electric) ~ 0 + pdq(1,0,1) + PDQ(0,1,0)),
+    
+    sarima101011 = ARIMA(log(amount_electric) ~ 0 + pdq(1,0,1) + PDQ(0,1,1)),
+    
+    sarima100010 = ARIMA(log(amount_electric) ~ 0 + pdq(1,0,0) + PDQ(0,1,0)),
+    
+    sarima100110 = ARIMA(log(amount_electric) ~ 0 + pdq(1,0,0) + PDQ(1,1,0)),
+    
+    sarima100111 = ARIMA(log(amount_electric) ~ 0 + pdq(1,0,0) + PDQ(1,1,1)),
+    
+    sarima201111 = ARIMA(log(amount_electric) ~ 0 + pdq(2,0,1) + PDQ(1,1,1))
+  )
+
+
+```
+
+```{r 1stdiff-plots, out.width='80%', fig.align='center', fig.cap = "ACF and PACF of the first seasonal difference", fig.height = 9}
+eletric_training_diff %>%
+  gg_tsdisplay(first_dif, plot_type = "partial")
+```
+
+Based on **information criteria**, we identified the best models in the previous set, which were SARIMA(1,0,1)(1,1,1), SARIMA(2,0,1)(1,1,1), and SARIMA(1,0,1)(0,1,1), since they presented the lowest values for AIC and BIC.
+
+```{r include = FALSE}
+
+## Model Selection
+
+#Information Criteria
+
+fit %>%
+  glance()
+#chose the 3 best models based on information criteria - lower AIC and BIC, to then compare with benchmark method
+
+best_mod <- eletric_training %>%
+  model(
+    sarima101111  = ARIMA(log(amount_electric) ~ 0 + pdq(1,0,1) + PDQ(1,1,1)),
+    
+    sarima201111 = ARIMA(log(amount_electric) ~ 0 + pdq(2,0,1) + PDQ(1,1,1)),
+    
+    sarima101011 = ARIMA(log(amount_electric) ~ 0 + pdq(1,0,1) + PDQ(0,1,1)), 
+    
+    snaive = SNAIVE(log(amount_electric))
+  )
+
+```
+
+Considering these were the best models, all three were submitted to **Ljung-Box test** and their residuals analyzed; nevertheless, only one was proven to be a white noise process and pass the Ljung-Box test, while the others showed statistical evidence of autocorrelation in the residuals. 
+
+```{r include = FALSE}
+#Residual Plots and Ljung-Box test for best models
+
+#sarima101111
+
+best_mod %>%
+  select(sarima101111) %>%
+  gg_tsresiduals() # not white noise - correlation
+
+
+augment(best_mod) %>%
+  filter(.model=='sarima101111') %>%
+  features(.innov, ljung_box, lag = 36 )   # p-value < 0.05 - autocorrelation in residuals
+
+
+#sarima201111
+
+best_mod %>%
+  select(sarima201111) %>%
+  gg_tsresiduals() #white noise
+
+
+augment(best_mod) %>%
+  filter(.model=='sarima201111') %>%
+  features(.innov, ljung_box, lag = 36 )   #no autocorrelation in the residuals
+
+
+
+#sarima101011
+
+best_mod %>%
+  select(sarima101011) %>%
+  gg_tsresiduals() # not white noise - correlation
+
+
+augment(best_mod) %>%
+  filter(.model=='sarima101011') %>%
+  features(.innov, ljung_box, lag = 36 )   # p-value < 0.05 - autocorrelation in residuals
+
+#Only sarima201111 passes the Ljung-Box test
+
+
+```
+
+Forecasts were then executed for the best models and compared to a benchmark method, with the respective results shown in Figure 3. 
+
+```{r include = FALSE}
+
+##Forecasting
+
+# Forecasting 24 months (2 years)
+
+forecast_mods <- best_mod %>%
+  forecast(h = "24 months")
+```
+
+
+```{r, out.width='80%', fig.align='center', fig.cap = "Forecast with best models", fig.height = 6 }
+
+forecast_mods %>%
+  autoplot(eletric_test,level= NULL) +labs(y= 'amount_electric',
+                                           title = 'Electric Production Forecasts using Best Models')
+
+```
+
+In terms of prediction accuracy, the findings suggest that SARIMA(2,0,1)(1,1,1) provided the best results, with smaller RMSE and MAE errors and a ME close to zero, indicating minimum bias. This was not surprising considering that it was the only model with no autocorrelation in its residuals (passed the Ljung-Box test).
+Therefore, **SARIMA(2,0,1)(1,1,1)** was the **final proposed model**.
+
+```{r include = FALSE}
+
+## Accuracy of the models 
+
+accuracy_metrics <- forecast_mods %>%
+  accuracy(eletric_test)
+
+print(accuracy_metrics)
+
+#sarima201111 had the best results:
+     #has lowest RMSE and MAE, and an ME close to zero - minimal bias
+
+```
+
+```{r results-table, out.width='10%', fig.align='center', fig.height = 8}
+
+accuracy_metrics <- forecast_mods %>%
+  accuracy(eletric_test)
+
+acc_df <- as.data.frame(accuracy_metrics)
+acc_df <- subset(acc_df, select = -c(.type, MASE, RMSSE, ACF1))
+
+knitr::kable(
+  acc_df,
+  caption = 'Model Error Measures on the Testing Sample',
+  align = 'c',
+  format = "html",
+  table.attr = "style='width:50%; margin-left:auto; margin-right:auto;'"
+)
+
+```
+
+
+# Conclusion
+
+In conclusion, this study seems to have successfully identified a forecasting model for the usual electric production which is displayed in the obtained results (Figure 4). 
+
+
+```{r include = FALSE}
+
+## Final Model SARIMA(2,0,1)(1,1,1)
+
+best_mod %>%
+  select(sarima201111) %>%
+  report()
+
+```
+
+```{r, out.width='80%', fig.align='center', fig.cap ="Forecast with the SARIMA Model (2,0,1)(1,1,1)", fig.height = 6 }
+
+## Final Forecast
+
+best_mod %>%
+  select('sarima201111') %>% 
+  forecast(h=24) %>%
+  autoplot(eletric_training) + labs(y='amount_electric',
+                                     title = 'Electric Production Final Forecast')
+
+```
+
+This model provides useful insights for electric firms, assisting with resource planning and optimization by forecasting shifts in electrical demand. Our forecasts suggest that electric production values will show similar behaviors as the previous years. As a result, electric firms may utilize these projections to improve their labor strategy, increase operational efficiency, and maintain a competitive advantage in the volatile electric market.
+
+Furthermore, the forecasting model can assist firms in detecting possible periods of high demand, allowing them to better manage resources and prevent any supply shortages. This proactive strategy not only promotes improved decision-making, but it also helps to ensure the industry's long-term growth and stability. Electric firms may use this information to better satisfy consumer expectations and adjust to market changes.
+
+```{r, include=FALSE}
+knitr::write_bib(c('knitr','rmarkdown','posterdown','pagedown'), 'packages.bib')
+```
+
+# References
+
+1. Time Series Basics and Getting Started with R
+
+2. Forecaster's Toolbox 
+
+3. Introduction to Time Series. ARMA models 
+
+4. Box - Jenkins methodology. Forecasting with ARIMA models. Introduction to Seasonal ARIMA models 
+
+5. Industrial Production: Utilities: Electric and Gas Utilities (NAICS = 2211,2). (2024b, May 16) 
+<https://fred.stlouisfed.org/series/IPUTIL>
+
+6. Brentthorne. (n.d.). posterdown_html. GitHub.
+<https://github.com/brentthorne/posterdown/wiki>
+
+
+**Data acquired from:**
+
+<https://www.kaggle.com/datasets/mwafia/electric-production>
